@@ -1,4 +1,4 @@
-import _pickle as cPickle
+import pickle
 import gzip
 
 import numpy as np
@@ -9,8 +9,8 @@ http://deeplearning.net/tutorial/gettingstarted.html#index-1
 '''
 
 def load_data():
-	f = gzip.open('mnist.pkl.gz')
-	train_set, val_set, test_set = cPickle.load(f)
+	f = gzip.open('datasets/mnist.pkl.gz')
+	train_set, val_set, test_set = pickle.load(f, encoding='latin1')
 	f.close()
 
 	return train_set, val_set, test_set
@@ -28,7 +28,7 @@ def load_data_wrapper():
 	test_X = [np.reshape(X, X_shape) for X in test_set[0]]
 	test_y = test_set[1]
 
-	return zip(train_X, train_y), zip(val_X, val_y), zip(test_X, test_y)
+	return list(zip(train_X, train_y)), list(zip(val_X, val_y)), list(zip(test_X, test_y))
 
 def one_hot(j):
 	ans = np.zeros((10, 1))
