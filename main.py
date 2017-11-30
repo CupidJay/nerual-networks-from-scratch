@@ -25,7 +25,7 @@ def test_load():
 
 def main(config):
 	train_set, val_set, test_set = load_data_wrapper()
-	net = NN([784, 10, 10])
+	net = NN([784, 10, 20, 10])
 	net.train(train_set, val_set)
 	
 

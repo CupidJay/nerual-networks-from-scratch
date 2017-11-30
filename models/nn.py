@@ -4,7 +4,7 @@ import numpy as np
 
 class NN(object):
 	def __init__(self, sizes):
-		self.layers = len(sizes)
+		self.num_layers = len(sizes)-1
 		self.sizes = sizes
 		self.biases = [np.random.randn(size, 1) for size in sizes[1:]]
 		self.weights = [np.random.randn(m, n) for m, n in zip(sizes[1:], sizes[:-1])]
@@ -20,7 +20,37 @@ class NN(object):
 
 		return x
 
-	def train(self, train_set, val_set, learning_rate=1e-3, epochs=2, batch_size=200):
+	def backward(self, x, y):
+		"""
+		in fact this backward include forward once to compute activation layerwise and the final loss
+		and backward once to backprop the final loss to each parameter
+		"""
+		delta_b = [np.zeros(b.shape) for b in self.biases]
+		delta_w = [np.zeros(w.shape) for w in self.biases]
+
+		activation = x #forward activation
+		activations = [] #store the activation value for each layer
+		zs = [] #store the z value for each layer
+
+		for b, w in zip(self.biases, self.weights):
+			z = np.dot(w, activation) + b
+			zs.append(z)
+			activation = sigmoid(z)
+			activations.append(activation)
+
+		#backward pass
+		for l in range(1, self.num_layers):
+			z = zs[-l]
+			if l==1:
+				delta = self.cost_prime(activation, y) * sigmoid_prime(z)
+			else:
+				delta = np.dot(self.weights[-l+1].transpose(), delta)*sigmoid_prime(z)
+			delta_b[-l] = delta
+			delta_w[-l] = np.dot(delta, activations[-l-1].transpose())
+
+		return delta_b, delta_w
+
+	def train(self, train_set, val_set, learning_rate=3, epochs=2, batch_size=200):
 		"""
 		train the nerual network using stochastic gradient descent(SGD)
 
@@ -56,12 +86,25 @@ class NN(object):
 			print('val performance is correct {} / {}'.format(self.test(val_set), num_val))
 
 	def update_mini_batch(self, mini_batch):
-		return
+		sum_delta_b = [np.zeros(b.shape) for b in self.biases]
+		sum_delta_w = [np.zeros(w.shape) for w in self.weights]
+
+		#this loop can be avoided so that we could use matrix multiplication
+		for x, y in mini_batch:
+			delta_b, delta_w = self.backward(x, y)
+			sum_delta_b = [nb+b for nb, b in zip(sum_delta_b, delta_b)]
+			sum_delta_w = [nw+w for nw, w in zip(sum_delta_w, delta_w)]
+
+		alpha = self.learning_rate / len(mini_batch)
+		self.biases = [b-alpha*nb for b, nb in zip(self.biases, sum_delta_b)]
+		self.weights = [w-alpha*nw for w, nw in zip(self.weights, sum_delta_w)]
 
 	def test(self, test_data):
 		test_results = [(np.argmax(self.forward(x)), y) for (x, y) in test_data]
 		return sum(int(x==y) for (x, y) in test_results)
 
+	def cost_prime(self, output, y):
+		return (output - y)
 
 
 def sigmoid(z):
