@@ -38,6 +38,8 @@ class NN(object):
 			activation = sigmoid(z)
 			activations.append(activation)
 
+		self.loss += self.cost(activation, y)
+
 		#backward pass
 		for l in range(1, self.num_layers):
 			z = zs[-l]
@@ -63,14 +65,19 @@ class NN(object):
 
 		learning_rate: Scalar giving learning rate for optimization
 
-		epochs: Number of training epochs
+		learning_rate_decay: Scalar decay rate each epoch
+
+		num_epochs: Number of training epochs
 
 		batch_size: Number of training examples to use per step
-
 		"""
 		num_train = len(train_set)
 		num_val = len(val_set)
 		self.learning_rate = learning_rate
+
+		loss_history = []
+		train_acc_history = []
+		val_acc_history = []
 
 		for epoch in range(num_epochs):
 			print('*'*15)
@@ -79,14 +86,29 @@ class NN(object):
 			#shuffle the train_set
 			random.shuffle(train_set)
 			mini_batches = [train_set[k: k+batch_size] for k in range(0, num_train, batch_size)]
-
+			self.loss = 0
 			for mini_batch in mini_batches:
 				self.update_mini_batch(mini_batch)
 
 			self.learning_rate *= learning_rate_decay
 
+			self.loss /= len(mini_batches)
+			print('mean loss per mini_batch is {}'.format(self.loss))
+
+			loss_history.append(self.loss)
+
 			print('val performance is : ', end='')
-			self.test(val_set)
+			val_acc = self.test(val_set)
+			val_acc_history.append(val_acc)
+
+			train_acc = self.test(train_set, False)
+			train_acc_history.append(train_acc)
+
+		return {
+			'loss_history': loss_history,
+			'train_acc_history': train_acc_history,
+			'val_acc_history': val_acc_history,
+		}
 
 	def update_mini_batch(self, mini_batch):
 		sum_delta_b = [np.zeros(b.shape) for b in self.biases]
@@ -102,12 +124,21 @@ class NN(object):
 		self.biases = [b-alpha*nb for b, nb in zip(self.biases, sum_delta_b)]
 		self.weights = [w-alpha*nw for w, nw in zip(self.weights, sum_delta_w)]
 
-	def test(self, test_data):
-		test_results = [(np.argmax(self.forward(x)), y) for (x, y) in test_data]
+
+	def test(self, test_data, verbose=True):
+		if verbose:
+			test_results = [(np.argmax(self.forward(x)), y) for (x, y) in test_data]
+		else:
+			test_results = [(np.argmax(self.forward(x)), np.argmax(y)) for (x, y) in test_data]
 		num_test = len(test_data)
 		num_correct = sum(int(x==y) for (x, y) in test_results)
-		print('correct numbers {} / {}'.format(num_correct, num_test))
+		if verbose:
+			print('correct numbers {} / {}'.format(num_correct, num_test))
+		return (num_correct/num_test)*100
 		
+
+	def cost(self, output, y):
+		return np.sum(np.square(output-y))
 
 	def cost_prime(self, output, y):
 		return (output - y)
