@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 from datasets.data_loader import load_data_wrapper
+from models.nn import NN
 
 parser = argparse.ArgumentParser()
 
@@ -23,9 +24,10 @@ def test_load():
 
 
 def main(config):
-	test_load()
+	train_set, val_set, test_set = load_data_wrapper()
+	net = NN([784, 10, 10])
+	net.train(train_set, val_set)
 	
-
 
 if __name__=="__main__":
 	config = parser.parse_args()
