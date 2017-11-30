@@ -50,7 +50,7 @@ class NN(object):
 
 		return delta_b, delta_w
 
-	def train(self, train_set, val_set, learning_rate=3, epochs=2, batch_size=200):
+	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, num_epochs=15, batch_size=200):
 		"""
 		train the nerual network using stochastic gradient descent(SGD)
 
@@ -72,9 +72,9 @@ class NN(object):
 		num_val = len(val_set)
 		self.learning_rate = learning_rate
 
-		for epoch in range(epochs):
+		for epoch in range(num_epochs):
 			print('*'*15)
-			print('epoch {} / {}'.format(epoch+1, epochs))
+			print('epoch {} / {}'.format(epoch+1, num_epochs))
 
 			#shuffle the train_set
 			random.shuffle(train_set)
@@ -83,7 +83,10 @@ class NN(object):
 			for mini_batch in mini_batches:
 				self.update_mini_batch(mini_batch)
 
-			print('val performance is correct {} / {}'.format(self.test(val_set), num_val))
+			self.learning_rate *= learning_rate_decay
+
+			print('val performance is : ', end='')
+			self.test(val_set)
 
 	def update_mini_batch(self, mini_batch):
 		sum_delta_b = [np.zeros(b.shape) for b in self.biases]
@@ -101,7 +104,10 @@ class NN(object):
 
 	def test(self, test_data):
 		test_results = [(np.argmax(self.forward(x)), y) for (x, y) in test_data]
-		return sum(int(x==y) for (x, y) in test_results)
+		num_test = len(test_data)
+		num_correct = sum(int(x==y) for (x, y) in test_results)
+		print('correct numbers {} / {}'.format(num_correct, num_test))
+		
 
 	def cost_prime(self, output, y):
 		return (output - y)
