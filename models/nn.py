@@ -4,7 +4,7 @@ import numpy as np
 
 class NN(object):
 	def __init__(self, sizes):
-		self.num_layers = len(sizes)-1
+		self.num_layers = len(sizes)
 		self.sizes = sizes
 		self.biases = [np.random.randn(size, 1) for size in sizes[1:]]
 		self.weights = [np.random.randn(m, n) for m, n in zip(sizes[1:], sizes[:-1])]
@@ -29,7 +29,7 @@ class NN(object):
 		delta_w = [np.zeros(w.shape) for w in self.biases]
 
 		activation = x #forward activation
-		activations = [] #store the activation value for each layer
+		activations = [x] #store the activation value for each layer
 		zs = [] #store the z value for each layer
 
 		for b, w in zip(self.biases, self.weights):
@@ -38,14 +38,20 @@ class NN(object):
 			activation = sigmoid(z)
 			activations.append(activation)
 
+		'''
+		delta = self.cost_prime(activations[-1], y) * sigmoid_prime(zs[-1])
+
+		delta_b[-1] = delta
+		delta_w[-1] = np.dot(delta, activations[-2].transpose())
+		'''
 		self.loss += self.cost(activation, y)
 
 		#backward pass
 		for l in range(1, self.num_layers):
-			z = zs[-l]
+			z = zs[-l]	
 			if l==1:
-				delta = self.cost_prime(activation, y) * sigmoid_prime(z)
-			else:
+				delta = self.cost_prime(activation, y)*sigmoid_prime(z)
+			else:			
 				delta = np.dot(self.weights[-l+1].transpose(), delta)*sigmoid_prime(z)
 			delta_b[-l] = delta
 			delta_w[-l] = np.dot(delta, activations[-l-1].transpose())
@@ -90,7 +96,8 @@ class NN(object):
 			for mini_batch in mini_batches:
 				self.update_mini_batch(mini_batch)
 
-			self.learning_rate *= learning_rate_decay
+			if epoch%5==0 and epoch!=0:
+				self.learning_rate *= learning_rate_decay
 
 			self.loss /= len(mini_batches)
 			print('mean loss per mini_batch is {}'.format(self.loss))
@@ -117,13 +124,12 @@ class NN(object):
 		#this loop can be avoided so that we could use matrix multiplication
 		for x, y in mini_batch:
 			delta_b, delta_w = self.backward(x, y)
-			sum_delta_b = [nb+b for nb, b in zip(sum_delta_b, delta_b)]
-			sum_delta_w = [nw+w for nw, w in zip(sum_delta_w, delta_w)]
+			sum_delta_b = [nb+dnb for nb, dnb in zip(sum_delta_b, delta_b)]
+			sum_delta_w = [nw+dnw for nw, dnw in zip(sum_delta_w, delta_w)]
 
-		alpha = self.learning_rate / len(mini_batch)
-		self.biases = [b-alpha*nb for b, nb in zip(self.biases, sum_delta_b)]
-		self.weights = [w-alpha*nw for w, nw in zip(self.weights, sum_delta_w)]
-
+		eta = self.learning_rate/len(mini_batch)
+		self.biases = [b-eta*nb for b, nb in zip(self.biases, sum_delta_b)]
+		self.weights = [w-eta*nw for w, nw in zip(self.weights, sum_delta_w)]	
 
 	def test(self, test_data, verbose=True):
 		if verbose:
@@ -135,7 +141,6 @@ class NN(object):
 		if verbose:
 			print('correct numbers {} / {}'.format(num_correct, num_test))
 		return (num_correct/num_test)*100
-		
 
 	def cost(self, output, y):
 		return np.sum(np.square(output-y))

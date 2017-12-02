@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 #some hyper parameters.
-parser.add_argument('--lr', type=float, default=4)
+parser.add_argument('--lr', type=float, default=3)
 parser.add_argument('--lr_decay', type=float, default=0.95)
 parser.add_argument('--num_epochs', type=int, default=20)
-parser.add_argument('--batch_size', type=int, default=100)
+parser.add_argument('--batch_size', type=int, default=10)
 
 #log parameters
 parser.add_argument('--save_log', type=bool, default=True)
@@ -82,7 +82,7 @@ def main(config):
 	train_set, val_set, test_set = load_data_wrapper()
 
 	#define the network
-	net = NN([784, 50, 10])
+	net = NN([784, 30, 10])
 
 	#train the network
 	history = net.train(train_set, val_set, config.lr, config.lr_decay, config.num_epochs, config.batch_size)
@@ -94,7 +94,7 @@ def main(config):
 
 	#test the network
 	print('final test performance is : ', end='')
-	net.test(test_set)
+	net.evaluate(test_set)
 
 if __name__=="__main__":
 	config = parser.parse_args()
