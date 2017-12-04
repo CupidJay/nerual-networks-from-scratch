@@ -23,7 +23,7 @@ class NN_advanced(object):
 		self.biases = [np.random.randn(size, 1) for size in sizes[1:]]
 		self.weights = [np.random.randn(m, n) for m, n in zip(sizes[1:], sizes[:-1])]
 		self.loss = loss
-		self.xavier_initialization()
+		#self.xavier_initialization()
 
 	def xavier_initialization(self):
 		#this is called xavier initialization

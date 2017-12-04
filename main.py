@@ -3,6 +3,8 @@ import numpy as np
 from datasets.data_loader import load_data_wrapper
 from models.nn import NN
 from models.nn_advanced import NN_advanced
+from models.nn_advanced import CrossEntropy
+from models.nn_advanced import MSE
 import os
 import datetime
 import pytz
@@ -102,7 +104,7 @@ def main(config):
 	sizes = [784, 30, 10]
 	#define the network
 	if config.advanced:
-		net = NN_advanced(sizes)
+		net = NN_advanced(sizes, loss=MSE)
 	else:
 		net = NN(sizes)
 
