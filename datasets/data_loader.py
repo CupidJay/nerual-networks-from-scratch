@@ -23,10 +23,10 @@ def load_data_wrapper():
 	train_y = [one_hot(y) for y in train_set[1]]
 
 	val_X = [np.reshape(X, X_shape) for X in val_set[0]]
-	val_y = val_set[1]
+	val_y = [one_hot(y) for y in val_set[1]]
 
 	test_X = [np.reshape(X, X_shape) for X in test_set[0]]
-	test_y = test_set[1]
+	test_y = [one_hot(y) for y in test_set[1]]
 
 	return list(zip(train_X, train_y)), list(zip(val_X, val_y)), list(zip(test_X, test_y))
 
