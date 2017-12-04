@@ -77,7 +77,7 @@ class NN_advanced(object):
 
 		return delta_b, delta_w
 
-	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, lamda=3, num_epochs=15, batch_size=200):
+	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, regularization='l2', lamda=3, num_epochs=15, batch_size=200):
 		"""
 		train the nerual network using stochastic gradient descent(SGD)
 
@@ -100,6 +100,7 @@ class NN_advanced(object):
 		num_val = len(val_set)
 		self.learning_rate = learning_rate
 		self.lamda = lamda
+		self.regularization = regularization
 
 		train_loss_history = []
 		val_loss_history = []
@@ -155,7 +156,13 @@ class NN_advanced(object):
 		eta = self.learning_rate/len(mini_batch)
 		lamda = self.learning_rate*self.lamda/n
 		self.biases = [b-eta*nb for b, nb in zip(self.biases, sum_delta_b)]
-		self.weights = [w-eta*nw-lamda*w for w, nw in zip(self.weights, sum_delta_w)]	
+
+		if self.regularization=='l2':
+			#l2 regularization
+			self.weights = [w-eta*nw-lamda*w for w, nw in zip(self.weights, sum_delta_w)]
+		else:
+			#l1 regularization
+			self.weights = [w-eta*nw-lamda*np.sign(w) for w, nw in zip(self.weights, sum_delta_w)]
 
 	def test(self, test_data, verbose=True):	
 		test_results = [(np.argmax(self.forward(x)), np.argmax(y)) for (x, y) in test_data]
