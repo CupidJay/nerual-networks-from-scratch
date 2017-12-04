@@ -1,18 +1,18 @@
 # nerual-networks-from-scratch
 Learn to understand and code nerual networks from scratch.
 
-I follow the work by [[Project]](http://neuralnetworksanddeeplearning.com/) 
-[[Book]](https://github.com/mnielsen/neural-networks-and-deep-learning)
+I follow the work nearual-networks-and-deep-learning [[Book]](http://neuralnetworksanddeeplearning.com/) 
+[[Project]](https://github.com/mnielsen/neural-networks-and-deep-learning)
 
-you can click the link above for more details.
+you can click the link above for more information.
 
 ## Work Introduction
 To better understand nerual networks, I rederivate the forward and backward equations and reimplement the code.
 
 I made modifications as below:
-* 1. add main.py to make you easier to run the code and change hyper-parameters.
-* 2. add Log control to save and plot your loss and acc history, which is easier for you to fine tune your network.
-* 3. add L1 regularization and SGD with momentum and so on.
+* add main.py to make you easier to run the code and change hyper-parameters.
+* add Log control to save and plot your loss and acc history, which is easier for you to fine tune your network.
+* add L1 regularization and SGD with momentum and so on.
 
 ## Prerequisites
 * python 3
