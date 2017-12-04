@@ -1,1 +1,0 @@
-train on first 1000 samples and add a l2 regularization term and the overfitting problem are less severe.

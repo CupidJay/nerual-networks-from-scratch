@@ -1,6 +1,0 @@
-batch_size: 10
-decay: 0.95
-epochs: 100
-lamda: 0.1
-lr: 3
-regular: l1

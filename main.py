@@ -16,12 +16,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--advanced', type=bool, default=True)
 
 #some hyper parameters.
-parser.add_argument('--lr', type=float, default=3)
+parser.add_argument('--lr', type=float, default=0.5)
 parser.add_argument('--lr_decay', type=float, default=0.95)
-parser.add_argument('--lamda', type=float, default=0)
+parser.add_argument('--lamda', type=float, default=5)
 #momentum = 0 just the naive SGD, now we use SGD with momentum
 parser.add_argument('--momentum', type=float, default=0.9)
-parser.add_argument('--num_epochs', type=int, default=100)
+parser.add_argument('--num_epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=10)
 parser.add_argument('--regularization', type=str, default='l2')
 
@@ -40,16 +40,17 @@ def get_log_dir(config):
 	cfg = dict(regular=config.regularization,
 				lr=config.lr, 
 			   decay=config.lr_decay,
+			   momentum=config.momentum,
 			   lamda=config.lamda,
 			   epochs = config.num_epochs,
 			   batch_size=config.batch_size)
-
+	'''
 	for k, v in cfg.items():
 		v = str(v)
 		if '/' in v:
 			continue
 		name += '_%s-%s' % (k.upper(), v)
-
+	'''
 	now = datetime.datetime.now(pytz.timezone('Asia/Shanghai'))
 	name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
 
@@ -113,9 +114,10 @@ def main(config):
 	sizes = [784, 30, 10]
 	#define the network
 	if config.advanced:
-		net = NN_advanced(sizes, loss=MSE)
+		net = NN_advanced(sizes, loss=CrossEntropy)
 		#train the network
-		history = net.train(train_set[:1000], val_set, config.lr, config.lr_decay, config.regularization, config.lamda, config.num_epochs, config.batch_size)
+		history = net.train(train_set, val_set, config.lr, config.lr_decay, config.momentum, 
+				config.regularization, config.lamda, config.num_epochs, config.batch_size)
 	else:
 		net = NN(sizes)
 		#train the network

@@ -23,7 +23,8 @@ class NN_advanced(object):
 		self.biases = [np.random.randn(size, 1) for size in sizes[1:]]
 		self.weights = [np.random.randn(m, n) for m, n in zip(sizes[1:], sizes[:-1])]
 		self.loss = loss
-		#self.xavier_initialization()
+		self.velocity = [np.zeros((m, n)) for m,n in zip(sizes[1:], sizes[:-1])]
+		self.xavier_initialization()
 
 	def xavier_initialization(self):
 		#this is called xavier initialization
@@ -77,7 +78,7 @@ class NN_advanced(object):
 
 		return delta_b, delta_w
 
-	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, regularization='l2', lamda=3, num_epochs=15, batch_size=200):
+	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, momentum=0.9, regularization='l2', lamda=3, num_epochs=15, batch_size=200):
 		"""
 		train the nerual network using stochastic gradient descent(SGD)
 
@@ -101,6 +102,7 @@ class NN_advanced(object):
 		self.learning_rate = learning_rate
 		self.lamda = lamda
 		self.regularization = regularization
+		self.momentum = momentum
 
 		train_loss_history = []
 		val_loss_history = []
@@ -159,10 +161,12 @@ class NN_advanced(object):
 
 		if self.regularization=='l2':
 			#l2 regularization
-			self.weights = [w-eta*nw-lamda*w for w, nw in zip(self.weights, sum_delta_w)]
+			self.velocity = [self.momentum*v-eta*nw-lamda*w for v, w, nw in zip(self.velocity, self.weights, sum_delta_w)]
+			self.weights = [w+v for w, v in zip(self.weights, self.velocity)]
 		else:
 			#l1 regularization
-			self.weights = [w-eta*nw-lamda*np.sign(w) for w, nw in zip(self.weights, sum_delta_w)]
+			self.velocity = [self.momentum*v-eta*nw-lamda*np.sign(w) for v, w, nw in zip(self.velocity, self.weights, sum_delta_w)]
+			self.weights = [w+v for w, v in zip(self.weights, self.velocity)]
 
 	def test(self, test_data, verbose=True):	
 		test_results = [(np.argmax(self.forward(x)), np.argmax(y)) for (x, y) in test_data]
@@ -183,7 +187,10 @@ class NN_advanced(object):
 
 		#regularization loss
 		#to be added
-		total += 0.5*self.lamda/len(data)*sum(np.sum(np.square(w)) for w in self.weights)
+		if self.regularization=='l2':
+			total += 0.5*self.lamda/len(data)*sum(np.sum(np.square(w)) for w in self.weights)
+		else:
+			total += self.lamda/len(data)*sum(np.sum(np.abs(w)) for w in self.weights) 
 
 		return total
 
