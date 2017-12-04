@@ -1,4 +1,0 @@
-batch_size: 10
-decay: 0.95
-epochs: 3
-lr: 3
