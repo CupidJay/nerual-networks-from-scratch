@@ -77,7 +77,7 @@ class NN_advanced(object):
 
 		return delta_b, delta_w
 
-	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, num_epochs=15, batch_size=200):
+	def train(self, train_set, val_set, learning_rate=3, learning_rate_decay=0.95, lamda=3, num_epochs=15, batch_size=200):
 		"""
 		train the nerual network using stochastic gradient descent(SGD)
 
@@ -99,6 +99,7 @@ class NN_advanced(object):
 		num_train = len(train_set)
 		num_val = len(val_set)
 		self.learning_rate = learning_rate
+		self.lamda = lamda
 
 		train_loss_history = []
 		val_loss_history = []
@@ -114,7 +115,7 @@ class NN_advanced(object):
 			mini_batches = [train_set[k: k+batch_size] for k in range(0, num_train, batch_size)]
 
 			for mini_batch in mini_batches:
-				self.update_mini_batch(mini_batch)
+				self.update_mini_batch(mini_batch, len(train_set))
 
 			if epoch%5==0 and epoch!=0:
 				self.learning_rate *= learning_rate_decay
@@ -141,7 +142,7 @@ class NN_advanced(object):
 			'val_acc_history': val_acc_history,
 		}
 
-	def update_mini_batch(self, mini_batch):
+	def update_mini_batch(self, mini_batch, n):
 		sum_delta_b = [np.zeros(b.shape) for b in self.biases]
 		sum_delta_w = [np.zeros(w.shape) for w in self.weights]
 
@@ -152,8 +153,9 @@ class NN_advanced(object):
 			sum_delta_w = [nw+dnw for nw, dnw in zip(sum_delta_w, delta_w)]
 
 		eta = self.learning_rate/len(mini_batch)
+		lamda = self.learning_rate*self.lamda/n
 		self.biases = [b-eta*nb for b, nb in zip(self.biases, sum_delta_b)]
-		self.weights = [w-eta*nw for w, nw in zip(self.weights, sum_delta_w)]	
+		self.weights = [w-eta*nw-lamda*w for w, nw in zip(self.weights, sum_delta_w)]	
 
 	def test(self, test_data, verbose=True):	
 		test_results = [(np.argmax(self.forward(x)), np.argmax(y)) for (x, y) in test_data]
@@ -174,9 +176,9 @@ class NN_advanced(object):
 
 		#regularization loss
 		#to be added
+		total += 0.5*self.lamda/len(data)*sum(np.sum(np.square(w)) for w in self.weights)
 
 		return total
-
 
 def sigmoid(z):
 	#sigmoid(z) = 1/(1+e^(-z))

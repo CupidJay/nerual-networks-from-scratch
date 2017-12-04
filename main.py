@@ -18,7 +18,8 @@ parser.add_argument('--advanced', type=bool, default=True)
 #some hyper parameters.
 parser.add_argument('--lr', type=float, default=3)
 parser.add_argument('--lr_decay', type=float, default=0.95)
-parser.add_argument('--num_epochs', type=int, default=3)
+parser.add_argument('--lamda', type=float, default=0)
+parser.add_argument('--num_epochs', type=int, default=100)
 parser.add_argument('--batch_size', type=int, default=10)
 
 #log parameters
@@ -101,18 +102,19 @@ def save_log(log_dir, config, history):
 def main(config):
 	train_set, val_set, test_set = load_data_wrapper()
 
+	#get_log_dir
+	log_dir = get_log_dir(config)
+
 	sizes = [784, 30, 10]
 	#define the network
 	if config.advanced:
 		net = NN_advanced(sizes, loss=MSE)
+		#train the network
+		history = net.train(train_set[:1000], val_set, config.lr, config.lr_decay, config.lamda, config.num_epochs, config.batch_size)
 	else:
 		net = NN(sizes)
-
-	#get_log_dir
-	log_dir = get_log_dir(config)
-
-	#train the network
-	history = net.train(train_set, val_set, config.lr, config.lr_decay, config.num_epochs, config.batch_size)
+		#train the network
+		history = net.train(train_set, val_set, config.lr, config.lr_decay, config.num_epochs, config.batch_size)
 
 	#save log
 	if config.save_log:
