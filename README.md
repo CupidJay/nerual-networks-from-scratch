@@ -40,7 +40,20 @@ I made modifications as below:
     python main.py --lr=0.5 --momentum=0.9 --lamda=1
     ```
 ### Finu-tune your network
-* after your train your net work, the loss and acc history will be saved to the corresponding folder. see the acc and loss figure to figure out performance of your network.
-#if you dont't want to save log, just set the parameter --save_log=False
-1. e.g. Loss dont't decrease for a long time, maybe your learning_rate is too large.
+after your train your net work, the loss and acc history will be saved to the corresponding folder. see the acc and loss figure to figure out performance of your network.<br>
 
+if you dont't want to save log, just set the parameter --save_log=False <br>
+
+1. For example, loss dont't decrease for a long time, maybe your learning_rate is too large. <br>
+
+2. There are many hyper-parameters for you to fine tune
+* `network size`: num_layers of your network and num_nerouns of each layer
+* `learning rate`: the learning rate of your optimizer(SGD e.g)
+* `learning rate decay`: the rate of your learning rate decay every several epochs
+* `regularization`: set it to 'l1' to choose l1 regularization and 'l2' for l2 regularization
+* `lambda`: the coefficient of regularization
+* `momentum`: the coefficient of momentum if your are using SGD with momentum
+* `num_epochs`: the total epochs you want to train
+* `batch_size`: mini-batch size
+
+Go and have a try!
