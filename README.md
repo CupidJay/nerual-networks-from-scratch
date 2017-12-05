@@ -1,5 +1,7 @@
 # nerual-networks-from-scratch
 Learn to understand and code nerual networks from scratch.
+[![pic]](https://github.com/CupidJay/hello-world/blob/master/nerual_network.jpg)
+[pic]:https://www.pyimagesearch.com/2016/09/26/a-simple-neural-network-with-python-and-keras/ "source picture"
 
 I follow the work nearual-networks-and-deep-learning [[Book]](http://neuralnetworksanddeeplearning.com/) 
 [[Project]](https://github.com/mnielsen/neural-networks-and-deep-learning)
