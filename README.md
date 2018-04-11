@@ -1,14 +1,14 @@
-# nerual-networks-from-scratch
-Learn to understand and code nerual networks from scratch.
+# neural-networks-from-scratch
+Learn to understand and code neural networks from scratch.
 ![](https://github.com/CupidJay/hello-world/blob/master/nerual_network.jpg)
 
-I follow the work nearual-networks-and-deep-learning [[Book]](http://neuralnetworksanddeeplearning.com/) 
+I follow the work neural-networks-and-deep-learning [[Book]](http://neuralnetworksanddeeplearning.com/) 
 [[Project]](https://github.com/mnielsen/neural-networks-and-deep-learning)
 
 you can click the link above for more information.
 
 ## Work Introduction
-To better understand nerual networks, I rederivate the forward and backward equations and reimplement the code.
+To better understand neural networks, I rederivate the forward and backward equations and reimplement the code.
 
 I made modifications as below:
 * add main.py to make you easier to run the code and change hyper-parameters.
