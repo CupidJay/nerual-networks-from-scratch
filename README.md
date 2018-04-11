@@ -22,7 +22,7 @@ I made modifications as below:
 ## Getting started
 1. get source code
     ```bash
-    git clone https://github.com/CupidJay/nerual-networks-from-scratch.git
+    git clone https://github.com/CupidJay/neural-networks-from-scratch.git
     ```
 2. download dataset
     ```bash
